@@ -1,0 +1,7 @@
+{
+  "name": "Copy of FocusFlow - 中学生智能学习助手",
+  "description": "专为中学生设计的智能学习规划与任务提醒工具，具有 AI 辅助学习计划、任务拆解和进度跟踪功能。",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
