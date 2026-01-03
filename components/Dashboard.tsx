@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Plus, CheckCircle2, Clock, Flame, BrainCircuit, Trash2, ChevronRight, Loader2 } from 'lucide-react';
-import { Task, Priority } from '../types';
+import { Plus, CheckCircle2, Clock, Flame, BrainCircuit, Trash2, ListChecks, Loader2 } from 'lucide-react';
+import { Task } from '../types';
 
 interface DashboardProps {
   tasks: Task[];
@@ -41,7 +41,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <CheckCircle2 size={20} />
           </div>
           <div>
-            <p className="text-[10px] text-slate-500 font-medium">已完成</p>
+            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">今日完成</p>
             <p className="text-lg font-bold text-slate-800">{completedToday}</p>
           </div>
         </div>
@@ -50,7 +50,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <Flame size={20} />
           </div>
           <div>
-            <p className="text-[10px] text-slate-500 font-medium">学习连击</p>
+            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">连续打卡</p>
             <p className="text-lg font-bold text-slate-800">5天</p>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <div className="flex items-start gap-3">
                     <button 
                       onClick={() => onToggleTask(task.id)}
-                      className="mt-1 w-6 h-6 rounded-lg border-2 border-slate-200 flex items-center justify-center hover:border-indigo-500"
+                      className="mt-1 w-6 h-6 rounded-lg border-2 border-slate-200 flex items-center justify-center hover:border-indigo-500 transition-colors"
                     >
                       <div className="w-3 h-3 bg-indigo-600 rounded-sm opacity-0 group-hover:opacity-10 transition-opacity"></div>
                     </button>
@@ -84,21 +84,21 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                       
                       {task.subtasks && task.subtasks.length > 0 && (
-                        <div className="mt-3 space-y-2 pl-2 border-l-2 border-indigo-50">
+                        <div className="mt-3 space-y-2 pl-3 border-l-2 border-indigo-100">
                           {task.subtasks.map((sub, i) => (
                             <div key={i} className="flex items-center gap-2 text-xs text-slate-500">
-                              <div className="w-1.5 h-1.5 rounded-full bg-indigo-300"></div>
+                              <div className="w-1 h-1 rounded-full bg-indigo-400"></div>
                               {sub.title}
                             </div>
                           ))}
                         </div>
                       )}
 
-                      <div className="mt-3 flex items-center gap-4">
+                      <div className="mt-4 flex items-center gap-3">
                         <button 
                           onClick={() => onBreakdownTask(task.id)}
                           disabled={!!isBreakingDown}
-                          className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors"
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50"
                         >
                           {isBreakingDown === task.id ? (
                             <Loader2 size={12} className="animate-spin" />
@@ -107,12 +107,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                           )}
                           AI 拆解步骤
                         </button>
-                        <span className="text-[10px] text-slate-400">截止: {task.dueDate}</span>
+                        <span className="text-[10px] text-slate-400 font-medium">截止: {task.dueDate}</span>
                       </div>
                     </div>
                     <button 
                       onClick={() => onDeleteTask(task.id)}
-                      className="p-2 text-slate-300 hover:text-rose-500"
+                      className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -120,26 +120,37 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200">
-                <p className="text-slate-400 font-medium">任务都完成了，休息一下吧！☕️</p>
+              <div className="text-center py-16 bg-white rounded-[2rem] border border-dashed border-slate-200">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <ListChecks size={32} />
+                </div>
+                <p className="text-slate-400 font-medium">今天的任务都完成了，真棒！☕️</p>
+                <button 
+                  onClick={onAddTask}
+                  className="mt-4 text-sm font-bold text-indigo-600 hover:underline"
+                >
+                  再添加一个？
+                </button>
               </div>
             )}
           </div>
         </section>
 
-        <section className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-6 text-white h-fit shadow-xl shadow-indigo-100">
+        <section className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-6 text-white h-fit shadow-xl shadow-indigo-100 sticky top-6">
           <div className="flex items-center gap-2 mb-4">
             <BrainCircuit size={18} className="text-indigo-200" />
-            <span className="text-xs font-bold uppercase tracking-widest text-indigo-100">AI 学习导师</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-100">AI 学习导师</span>
           </div>
-          <p className="text-lg font-medium leading-relaxed italic">
+          <p className="text-lg font-medium leading-relaxed italic mb-8">
             “{motivationalTip}”
           </p>
-          <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
-            <div className="text-xs text-indigo-200">当前状态: 专注中</div>
-            <button className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">
-              获取新建议
-            </button>
+          <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+            <div className="text-[10px] text-indigo-200 uppercase tracking-widest font-bold">专注状态: 极佳</div>
+            <div className="flex -space-x-2">
+                {[1,2,3].map(i => (
+                    <img key={i} className="w-6 h-6 rounded-full border-2 border-indigo-600" src={`https://picsum.photos/seed/${i+10}/40/40`} alt="buddy" />
+                ))}
+            </div>
           </div>
         </section>
       </div>
