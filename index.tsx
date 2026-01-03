@@ -1,32 +1,32 @@
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 
-const mountApp = () => {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) return;
+const container = document.getElementById('root');
 
+if (container) {
   try {
-    const root = ReactDOM.createRoot(rootElement);
+    const root = createRoot(container);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
+    
+    // 隐藏加载提示
+    const timeoutMsg = document.getElementById('loading-timeout-msg');
+    if (timeoutMsg) timeoutMsg.style.display = 'none';
+    
+    console.log("FocusFlow application initialized successfully.");
   } catch (error) {
-    console.error("React Init Error:", error);
+    console.error("Critical: Failed to mount React application", error);
     const log = document.getElementById('mobile-error-log');
     if (log) {
       log.style.display = 'block';
-      log.innerHTML += `<div><b>React Render Error:</b> ${error instanceof Error ? error.message : String(error)}</div>`;
+      log.innerHTML += `<div><b>[React挂载失败]:</b> ${error instanceof Error ? error.message : String(error)}</div>`;
     }
   }
-};
-
-// 确保 DOM 加载完成后再挂载
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mountApp);
 } else {
-  mountApp();
+  console.error("Critical: Root element #root not found in the DOM.");
 }
