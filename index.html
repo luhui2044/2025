@@ -23,25 +23,11 @@
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background-color: #f8fafc;
             -webkit-tap-highlight-color: transparent;
-            /* 适配刘海屏 */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
         .font-accent {
             font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        /* 隐藏 PWA 模式下的滚动条，让界面更像原生 App */
-        @media all and (display-mode: standalone) {
-            body {
-                user-select: none;
-            }
         }
     </style>
 <script type="importmap">
@@ -59,13 +45,13 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- 关键修复：显式引入 index.tsx 入口文件 -->
+    <script type="module" src="./index.tsx"></script>
     <script>
-        // 全局 PWA 安装事件监听
         window.deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             window.deferredPrompt = e;
-            // 通知应用可以显示安装按钮了
             window.dispatchEvent(new Event('can-install-pwa'));
         });
 
