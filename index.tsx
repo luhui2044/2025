@@ -3,10 +3,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  console.error("Could not find root element to mount to");
-} else {
+const mountApp = () => {
+  const rootElement = document.getElementById('root');
+  if (!rootElement) return;
+
   try {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -15,7 +15,18 @@ if (!rootElement) {
       </React.StrictMode>
     );
   } catch (error) {
-    console.error("React Render Error:", error);
-    rootElement.innerHTML = `<div style="padding: 20px; color: red;">应用加载失败，请刷新页面重试。</div>`;
+    console.error("React Init Error:", error);
+    const log = document.getElementById('mobile-error-log');
+    if (log) {
+      log.style.display = 'block';
+      log.innerHTML += `<div><b>React Render Error:</b> ${error instanceof Error ? error.message : String(error)}</div>`;
+    }
   }
+};
+
+// 确保 DOM 加载完成后再挂载
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountApp);
+} else {
+  mountApp();
 }

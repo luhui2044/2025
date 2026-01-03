@@ -1,10 +1,16 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// 助手函数：安全获取 API Key 并在使用时初始化客户端
+// 这是一个安全的 API 客户端获取器
 const getAiClient = () => {
-  // 兼容性处理：如果 process 不存在则使用空字符串，防止报错导致白屏
-  const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : '';
+  let apiKey = "";
+  try {
+    // 尝试多种方式获取 Key，如果都没有则留空（由后续调用处理提示）
+    apiKey = (window as any).process?.env?.API_KEY || "";
+  } catch (e) {
+    apiKey = "";
+  }
+  
   return new GoogleGenAI({ apiKey: apiKey });
 };
 
@@ -63,9 +69,13 @@ export const breakDownTask = async (taskTitle: string) => {
 
 export const getMotivationalTip = async (stats: string) => {
     const ai = getAiClient();
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `根据学生当前状态： "${stats}"，给出一句简短（1句）、鼓励且酷酷的动力语录。语调要符合13岁学生的口味，使用中文回答。`,
-    });
-    return response.text;
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: `根据学生当前状态： "${stats}"，给出一句简短（1句）、鼓励且酷酷的动力语录。语调要符合13岁学生的口味，使用中文回答。`,
+        });
+        return response.text;
+    } catch (err) {
+        return "每一次努力，都是在为未来的自己投票。";
+    }
 };
