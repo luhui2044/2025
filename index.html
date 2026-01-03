@@ -20,19 +20,17 @@
             content: '正在构建学习空间...';
             display: flex; align-items: center; justify-content: center;
             height: 100vh; color: #6366f1; font-weight: bold; font-size: 1.1rem;
+            animation: pulse 2s infinite;
         }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
         #mobile-error-log {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: white; z-index: 9999; padding: 20px;
-            display: none; overflow: auto; color: #e11d48; font-family: monospace; font-size: 12px;
+            background: #fff; z-index: 9999; padding: 25px;
+            display: none; overflow: auto; color: #e11d48; font-family: monospace; font-size: 13px;
+            border: 8px solid #fecaca;
         }
-        /* 自定义滚动条 */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 
-    <!-- 兼容旧版浏览器的 Shim -->
     <script async src="https://ga.jspm.io/npm:es-module-shims@1.10.1/dist/es-module-shims.js"></script>
 
     <script type="importmap">
@@ -41,9 +39,9 @@
     "react": "https://esm.sh/react@18.3.1",
     "react-dom": "https://esm.sh/react-dom@18.3.1",
     "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.460.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.460.0?external=react",
     "@google/genai": "https://esm.sh/@google/genai@0.21.0",
-    "recharts": "https://esm.sh/recharts@2.13.3",
+    "recharts": "https://esm.sh/recharts@2.13.3?external=react,react-dom",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/"
   }
@@ -55,28 +53,30 @@
     <div id="mobile-error-log"></div>
 
     <script>
-        // 环境变量模拟
-        window.process = { env: { API_KEY: "" } };
+        window.process = { env: { API_KEY: "" }, nextTick: function(f){setTimeout(f,0)} };
         
-        // 错误捕获
         window.onerror = function(msg, url, line, col, error) {
             var log = document.getElementById('mobile-error-log');
             if (log) {
                 log.style.display = 'block';
-                log.innerHTML += '<div style="margin-bottom:10px; border-bottom:1px solid #fee2e2; padding-bottom:10px;">' +
-                    '<b>[渲染错误]:</b> ' + msg + '<br>' +
-                    '<small>' + url.split('/').pop() + ':' + line + '</small>' +
+                log.innerHTML += '<div style="margin-bottom:15px; border-bottom:1px solid #fee2e2; padding-bottom:10px;">' +
+                    '<h3 style="margin:0;color:#b91c1c">脚本执行异常</h3>' +
+                    '<p style="margin:5px 0"><b>错误信息:</b> ' + msg + '</p>' +
+                    '<small style="color:#6b7280">' + (url ? url.split('/').pop() : 'inline') + ':' + line + '</small>' +
+                    (error && error.stack ? '<pre style="font-size:10px; background:#fff1f2; padding:8px; margin-top:8px; white-space:pre-wrap;">' + error.stack + '</pre>' : '') +
                     '</div>';
             }
             return false;
         };
 
-        // 检查是否长期未加载
-        setTimeout(function() {
-            if (document.getElementById('root').innerHTML === "") {
-                console.warn("渲染时间过长，请检查网络或刷新页面");
+        window.onunhandledrejection = function(event) {
+            var log = document.getElementById('mobile-error-log');
+            if (log) {
+                log.style.display = 'block';
+                log.innerHTML += '<div style="color:#b91c1c"><b>网络请求或模块加载失败:</b> ' + 
+                    (event.reason && event.reason.message ? event.reason.message : '请检查您的网络连接') + '</div>';
             }
-        }, 5000);
+        };
     </script>
     <script type="module" src="./index.tsx"></script>
 </body>
