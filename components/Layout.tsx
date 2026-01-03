@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { LayoutDashboard, Calendar, BrainCircuit, BarChart3, Bell, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { LayoutDashboard, Calendar, BrainCircuit, BarChart3, Bell, BookOpen, Download } from 'lucide-react';
 import { AppSection } from '../types';
 
 interface LayoutProps {
@@ -10,6 +10,33 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeSection, setActiveSection }) => {
+  const [canInstall, setCanInstall] = useState(false);
+
+  useEffect(() => {
+    // 监听安装事件
+    const checkInstall = () => {
+      if ((window as any).deferredPrompt) {
+        setCanInstall(true);
+      }
+    };
+
+    window.addEventListener('can-install-pwa', checkInstall);
+    // 初始检查一次
+    checkInstall();
+
+    return () => window.removeEventListener('can-install-pwa', checkInstall);
+  }, []);
+
+  const handleInstall = async () => {
+    const promptEvent = (window as any).deferredPrompt;
+    if (!promptEvent) return;
+    promptEvent.prompt();
+    const { outcome } = await promptEvent.userChoice;
+    console.log(`User response to install prompt: ${outcome}`);
+    (window as any).deferredPrompt = null;
+    setCanInstall(false);
+  };
+
   const navItems = [
     { id: AppSection.Dashboard, label: '仪表盘', icon: LayoutDashboard },
     { id: AppSection.Planner, label: '学习计划', icon: Calendar },
@@ -46,7 +73,18 @@ const Layout: React.FC<LayoutProps> = ({ children, activeSection, setActiveSecti
           </nav>
         </div>
         
-        <div className="mt-auto p-6 border-t border-slate-100">
+        <div className="mt-auto p-6 space-y-4 border-t border-slate-100">
+          {/* Install PWA Button */}
+          {canInstall && (
+            <button 
+              onClick={handleInstall}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-colors border border-emerald-100"
+            >
+              <Download size={16} />
+              安装到手机
+            </button>
+          )}
+
           <div className="bg-indigo-600 rounded-2xl p-4 text-white">
             <p className="text-xs opacity-80 mb-1">本周坚持天数</p>
             <p className="text-lg font-bold">🔥 5 天连续!</p>

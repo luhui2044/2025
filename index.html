@@ -3,17 +3,45 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA & Mobile Optimization -->
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FocusFlow">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/5833/5833290.png">
+    
+    <link rel="manifest" href="./manifest.json">
     <title>FocusFlow - 智能学习助手</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Quicksand:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         body {
             font-family: 'Inter', 'Noto Sans SC', sans-serif;
             background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            /* 适配刘海屏 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .font-accent {
             font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        /* 隐藏 PWA 模式下的滚动条，让界面更像原生 App */
+        @media all and (display-mode: standalone) {
+            body {
+                user-select: none;
+            }
         }
     </style>
 <script type="importmap">
@@ -31,5 +59,23 @@
 </head>
 <body>
     <div id="root"></div>
+    <script>
+        // 全局 PWA 安装事件监听
+        window.deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPrompt = e;
+            // 通知应用可以显示安装按钮了
+            window.dispatchEvent(new Event('can-install-pwa'));
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Registration Failed', err));
+            });
+        }
+    </script>
 </body>
 </html>
